@@ -59,7 +59,8 @@ Congratulations! You just manually performed the process that vet will now autom
 
 ### The "Trusting" One-Liner
 ```bash
-# This is the curl-to-bash pattern. Use with caution.
+# This is the curl-to-bash pattern.
+# Don't actually do this. That's the whole point.
 curl -sL https://getvet.sh | bash
 ```
 ---
