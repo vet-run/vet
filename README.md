@@ -43,8 +43,16 @@ We believe you should never blindly trust a script from the internet—not even 
 This is the two-step "Download, then Review" process that vet automates.
 
 1. **Download the installer**:
+
+Choose one of the following sources. The first is the official project domain, and the second is a direct link to the GitHub release asset.
+
+*Option A: Official project domain*
 ```bash
 curl -o install_vet.sh https://getvet.sh
+```
+*Option B: Direct GitHub Release Link*
+```bash
+curl -o install_vet.sh https://github.com/vet-run/vet/releases/latest/download/vet
 ```
 2. **Review the installer's code.** Open it in a text editor or use less to ensure it's not doing anything suspicious. It's a simple script that downloads the correct vet script and moves it to /usr/local/bin.
 ```bash

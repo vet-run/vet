@@ -40,6 +40,14 @@
       font-size: 1.2rem;
       color: #e4e4e4;
     }
+    h4 {
+      font-weight: normal;
+      font-size: 0.9rem;
+      color: #e4e4e4;
+      margin-top: 0em;
+      margin-bottom: 1em;
+      font-weight: 600;
+    }
     p {
       margin: 1rem 0;
       font-size: 0.9rem;
@@ -48,10 +56,20 @@
       color: #e4e4e4;
       font-weight: 600;
     }
-    code, pre {
+    pre {
+      display: block;
+      font-family: monospace;
+      unicode-bidi: isolate;
+      white-space: pre;
+      margin-block: 0em;
+      margin-inline: 0px;
+      margin: 0;
+      padding: 0;
+    }
+    code {
       padding: 0.25em 0.5em;
       border-radius: 6px;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
       line-height: 1.4rem;
     }
     code {
@@ -125,14 +143,41 @@
 <code>vet https://example.com/install.sh</code></pre>
     </div>
     <h3>Installation</h3>
+    <h4>The Safe Way (Recommended)</h4>
+    <p>This is the two-step "Download, then Review" process that <code class="vet">vet</code> automates.</p>
+    <ol>
+      <li>
+        <p><strong>Download the installer:</strong></p>
+        <p>Choose one of the following sources. The first is the official project domain, and the second is a direct link to the GitHub release asset.</p>
+        <p>Option A: Official project domain</p>
+        <div class="install-box">
+<pre><code>curl -o install_vet.sh https://getvet.sh</code></pre>
+        </div>
+        <p>Option B: Direct GitHub Release Link</p>
+        <div class="install-box">
+<pre><code>curl -o install_vet.sh https://github.com/vet-run/vet/releases/latest/download/vet</code></pre>
+        </div>
+      </li>
+      <li>
+        <p><strong>Review the installer's code.</strong> Open it in a text editor or use less to ensure it's not doing anything suspicious. It's a simple script that downloads the correct <code class="vet">vet</code> script and moves it to /usr/local/bin.</p>
+        <div class="install-box">
+<pre><code>less install_vet.sh</code></pre>
+        </div>
+      </li>
+      <li>
+        <p><strong>Run the installer you just vetted:</strong></p>
+        <div class="install-box">
+<pre><code>sh install_vet.sh</code></pre>
+        </div>
+      </li>
+    </ol>
+    <p>Congratulations! You just manually performed the process that <code class="vet">vet</code> will now automate for you.</p>
+    <h4>The "Trusting" One-Liner</h4>
     <p>In your terminal, run:</p>
     <div class="install-box">
-<pre><code>curl -sL https://getvet.sh | sh</code></pre>
+<pre><code class="comment"># Don't actually do this. That's the whole point.</code>
+<code>curl -sL https://getvet.sh | sh</code></pre>
     </div>
-
-    <p class="footer">
-        Yes, we see the irony! We encourage you to inspect our installer first. That's the whole point of vet. You can read the installer's source code <a href="https://github.com/vet-run/vet/blob/main/scripts/install.sh">install.sh</a>
-    </p>
 
     <div class="footer">
       ➤ View the source on <a href="https://github.com/vet-run/vet">GitHub</a>
