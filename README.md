@@ -52,7 +52,7 @@ curl -o install_vet.sh https://getvet.sh
 ```
 *Option B: Direct GitHub Release Link*
 ```bash
-curl -o install_vet.sh https://github.com/vet-run/vet/releases/latest/download/vet
+curl -o install_vet.sh https://github.com/vet-run/vet/releases/latest/download/install.sh
 ```
 2. **Review the installer's code.** Open it in a text editor or use less to ensure it's not doing anything suspicious. It's a simple script that downloads the correct vet script and moves it to /usr/local/bin.
 ```bash
