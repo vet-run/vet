@@ -48,7 +48,7 @@ Choose one of the following sources. The first is the official project domain, a
 
 *Option A: Official project domain*
 ```bash
-curl -o install_vet.sh https://getvet.sh
+curl -o install_vet.sh https://getvet.sh/install.sh
 ```
 *Option B: Direct GitHub Release Link*
 ```bash
@@ -69,7 +69,7 @@ Congratulations! You just manually performed the process that vet will now autom
 ```bash
 # This is the curl-to-bash pattern.
 # Don't actually do this. That's the whole point.
-curl -sL https://getvet.sh | bash
+curl -sL https://getvet.sh/install.sh | bash
 ```
 ---
 ### Usage
