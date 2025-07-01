@@ -22,4 +22,4 @@ jobs:
         run: |
           gh release create ${{ github.ref_name }} ./vet ./scripts/install.sh \
             --title "Release ${{ github.ref_name }}" \
-            --generate-notes
+            --notes-file release-notes.md
