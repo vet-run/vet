@@ -20,7 +20,7 @@
     .container {
       width: 100%;
       max-width: 780px;
-      padding: 2.5rem;
+      padding: 2.5rem 2.5rem 7rem 2.5rem;
     }
     h1 {
       color: #75b6ff;
@@ -30,7 +30,7 @@
     h2 {
       font-weight: normal;
       font-size: 1rem;
-      color: #e4e4e4;
+      color: #f1f1f1;
       margin-top: 0em;
       margin-bottom: 1em;
       font-weight: 600;
@@ -38,6 +38,11 @@
     h3 {
       margin-top: 2rem;
       font-size: 1.2rem;
+      color: #f1f1f1;
+    }
+    h3.section {
+      margin-top: 1.5rem;
+      font-size: 1rem;
       color: #e4e4e4;
     }
     h4 {
@@ -82,6 +87,15 @@
         color: #6a6a6a;
         font-style: italic;
     }
+    ol {
+      font-size: 0.9rem;
+      display: block;
+      list-style-type: decimal;
+      margin-block-start: 1em;
+      margin-block-end: 1em;
+      padding-inline-start: 40px;
+      unicode-bidi: isolate;
+    }
     .install-box {
       background-color: #161b22;
       padding: 0.6rem;
@@ -104,9 +118,11 @@
     a:hover {
       text-decoration: underline;
     }
-    .footer {
+    .note {
       margin-top: 2rem;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      width: 100%;
+      text-align: right;
     }
     .ascii-header {
       color: #75b6ff;
@@ -120,6 +136,9 @@
 </head>
 <body>
   <div class="container">
+    <div class="note">
+      View the source on <a href="https://github.com/vet-run/vet">GitHub</a>
+    </div>
     <h1>vet</h1>
     <h2>Don't just run it — <code class="vet">vet</code> it.</h2>
     <p>Stop blindly piping to bash. <code class="vet">vet</code>  lets you inspect remote scripts for changes, run them through a linter, and require your explicit approval before they can execute.</p>
@@ -143,7 +162,17 @@
 <code>vet https://example.com/install.sh</code></pre>
     </div>
     <h3>Installation</h3>
-    <h4>The Safe Way (Recommended)</h4>
+    <h3 class="section">Homebrew (macOS/Linux)</h3>
+    <p>The easiest and recommended way to install <code class="vet">vet</code> is via Homebrew.</p>
+    <div class="install-box">
+<pre><code class="comment"># First, tap the official repository</code>
+<code>brew tap vet-run/vet</code>
+<code></code>
+<code class="comment"># Now, install the formula</code>
+<code>brew install vet-run</code></pre>
+    </div>
+    <h3 class="section">Manual Installation</h3>
+    <h4>The Safe Way</h4>
     <p>This is the two-step "Download, then Review" process that <code class="vet">vet</code> automates.</p>
     <ol>
       <li>
@@ -172,15 +201,11 @@
       </li>
     </ol>
     <p>Congratulations! You just manually performed the process that <code class="vet">vet</code> will now automate for you.</p>
-    <h4>The "Trusting" One-Liner</h4>
+    <h4>The "Trusting" One-Liner (The Anti-Pattern)</h4>
     <p>In your terminal, run:</p>
     <div class="install-box">
 <pre><code class="comment"># Don't actually do this. That's the whole point.</code>
 <code>curl -sL https://getvet.sh/install.sh | sh</code></pre>
-    </div>
-
-    <div class="footer">
-      ➤ View the source on <a href="https://github.com/vet-run/vet">GitHub</a>
     </div>
   </div>
 </body>

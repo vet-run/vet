@@ -36,11 +36,24 @@ vet https://example.com/install.sh
 
 ## Installation
 
-We believe you should never blindly trust a script from the internet—not even ours. That's why `vet` exists. The installation process itself is a perfect demonstration of the problem vet solves.
+We believe you should never blindly trust a script from the internet—not even ours. That's why `vet` exists. The installation process itself is a perfect demonstration of the problem `vet` solves.
 
-### The Safe Way (Recommended)
+## Homebrew (macOS/Linux) - Recommended
 
-This is the two-step "Download, then Review" process that vet automates.
+The easiest and recommended way to install `vet` is via Homebrew.
+```
+# First, tap the official repository
+brew tap vet-run/vet
+
+# Now, install the formula
+brew install vet-run
+```
+**Note:** The formula is named `vet-run` to avoid a conflict with another tool in the Homebrew ecosystem, but this command will correctly install the `vet` executable on your system.
+
+## Manual Installation
+
+### The Safe Way
+If you don't use Homebrew, or if you simply wish to follow the security-first principle that `vet` champions, you can perform a manual installation. This is the two-step "Download, then Review" process that demonstrates exactly what `vet` automates for you.
 
 1. **Download the installer**:
 
@@ -65,7 +78,7 @@ bash install_vet.sh
 
 Congratulations! You just manually performed the process that vet will now automate for you.
 
-### The "Trusting" One-Liner
+### The "Trusting" One-Liner (The Anti-Pattern)
 ```bash
 # This is the curl-to-bash pattern.
 # Don't actually do this. That's the whole point.
@@ -127,6 +140,10 @@ Contributions are welcome! If you have an idea for a new feature or have found a
 -   Push to the branch (git push origin feature/my-amazing-feature).
 
 -   Open a new Pull Request.
+
+## Acknowledgements
+
+This project is made better by its contributors. See our [Contributors](CONTRIBUTORS.md) file to recognize those who have helped shape `vet`.
 
 ## License
 
