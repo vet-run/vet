@@ -45,6 +45,7 @@ EOF
 # shellcheck disable=SC2317
 cleanup() {
     [ -n "${TMPFILE:-}" ] && [ -f "${TMPFILE}" ] && rm -f "${TMPFILE}"
+    [ -n "${TMPFILE_DIFF:-}" ] && [ -f "${TMPFILE_DIFF}" ] && rm -f "${TMPFILE_DIFF}"
 }
 
 check_dependencies() {
@@ -102,6 +103,7 @@ check_dependencies
 
 mkdir -p "$CACHE_DIR"
 TMPFILE=$(mktemp) || { log_error "Failed to create temporary file."; exit 1; }
+TMPFILE_DIFF=$(mktemp) || { log_error "Failed to create temporary diff file."; exit 1; }
 
 log_info "Downloading script from: $URL"
 if ! "${DOWNLOAD_CMD[@]}" "$TMPFILE" "$URL"; then
@@ -128,16 +130,15 @@ CACHE_FILE_ID=$(echo -n "$URL" | sha256sum | awk '{print $1}')
 CACHE_FILE_PATH="${CACHE_DIR}/${CACHE_FILE_ID}.sh"
 
 if [ -f "$CACHE_FILE_PATH" ]; then
-    OLD_HASH=$(sha256sum "$CACHE_FILE_PATH" | awk '{print $1}')
-    NEW_HASH=$(sha256sum "$TMPFILE" | awk '{print $1}')
-
-    if [ "$OLD_HASH" == "$NEW_HASH" ]; then
+    if diff -u "$CACHE_FILE_PATH" "$TMPFILE" > "$TMPFILE_DIFF"; then
         log_ok "No changes detected since last run."
     elif [ "$FORCE_MODE" -eq 0 ]; then
         log_warn "Script has CHANGED since the last run."
         printf "[?] %sShow diff?%s [y/N] " "$C_BOLD" "$C_RESET"
         read -n 1 -r REPLY; echo
-        diff -u "$CACHE_FILE_PATH" "$TMPFILE" | less
+        if [[ "$REPLY" =~ ^[Yy]$ ]]; then
+            less "$TMPFILE_DIFF"
+        fi
     fi
 fi
 
