@@ -137,7 +137,7 @@ if [ -f "$CACHE_FILE_PATH" ]; then
         printf "[?] %sShow diff?%s [y/N] " "$C_BOLD" "$C_RESET"
         read -n 1 -r REPLY; echo
         if [[ "$REPLY" =~ ^[Yy]$ ]]; then
-            less "$TMPFILE_DIFF"
+            less -U "$TMPFILE_DIFF"
         fi
     fi
 fi
@@ -184,7 +184,7 @@ if [ -t 0 ]; then
         if [ -n "$BAT_CMD" ]; then
             "$BAT_CMD" -l sh --paging=always "$TMPFILE"
         else
-            less "$TMPFILE"
+            less -U "$TMPFILE"
         fi
     fi
     printf "[?] %sExecute this script?%s [y/N] " "$C_BOLD" "$C_RESET"
