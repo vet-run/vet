@@ -50,6 +50,25 @@ brew install vet-run
 ```
 **Note:** The formula is named `vet-run` to avoid a conflict with another tool in the Homebrew ecosystem, but this command will correctly install the `vet` executable on your system.
 
+## Arch Linux
+
+Installation from the Arch User Repository (AUR) is recommended for users of Arch or Arch-based Linux distributions. The official procedure is documented [here](https://wiki.archlinux.org/title/Arch_User_Repository#Installing_and_upgrading_packages), but here are the steps:
+```
+# First, clone the AUR git repo
+git clone https://aur.archlinux.org/vet.git
+
+cd vet
+
+# Now, as you should always do, review the PKGBUILD!
+cat PKGBUILD
+
+# Next, build the package and install
+makepkg -si
+```
+Use the [vet](https://aur.archlinux.org/packages/vet) package for stable releases, and the [vet-git](https://aur.archlinux.org/packages/vet-git) package for the latest vet commit.
+
+**Note:** these steps (and package updates) can of course be automated via an AUR helper such as [yay](https://github.com/Jguer/yay) or [paru](https://github.com/morganamilo/paru), but as with the security principle that `vet` promotes, you should still read the PKGBUILD before building and installing the package.
+
 ## Manual Installation
 
 ### The Safe Way
