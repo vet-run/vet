@@ -38,9 +38,9 @@ vet https://example.com/install.sh
 
 We believe you should never blindly trust a script from the internet—not even ours. That's why `vet` exists. The installation process itself is a perfect demonstration of the problem `vet` solves.
 
-## Homebrew (macOS/Linux) - Recommended
+## Homebrew
 
-The easiest and recommended way to install `vet` is via Homebrew.
+For macOS users, the easiest and recommended way to install `vet` is via Homebrew.
 ```
 # First, tap the official repository
 brew tap vet-run/vet
@@ -72,7 +72,7 @@ Use the [vet](https://aur.archlinux.org/packages/vet) package for stable release
 ## Manual Installation
 
 ### The Safe Way
-If you don't use Homebrew, or if you simply wish to follow the security-first principle that `vet` champions, you can perform a manual installation. This is the two-step "Download, then Review" process that demonstrates exactly what `vet` automates for you.
+If you don't use macOS/Arch Linux, or if you simply wish to follow the security-first principle that `vet` champions, you can perform a manual installation. This is the two-step "Download, then Review" process that demonstrates exactly what `vet` automates for you.
 
 1. **Download the installer**:
 
