@@ -67,7 +67,7 @@ makepkg -si
 ```
 Use the [vet](https://aur.archlinux.org/packages/vet) package for stable releases, and the [vet-git](https://aur.archlinux.org/packages/vet-git) package for the latest vet commit.
 
-**Note:** these steps (and package updates) can of course be automated via an AUR helper such as [yay](https://github.com/Jguer/yay) or [paru](https://github.com/morganamilo/paru), but as with the security principle that `vet` promotes, you should still read the PKGBUILD before building and installing the package.
+**Note:** These installation steps (and package updates) can of course be automated via an AUR helper such as [yay](https://github.com/Jguer/yay) or [paru](https://github.com/morganamilo/paru). But, as with the security principle that `vet` promotes, you should still read the PKGBUILD before building and installing the package.
 
 ## Manual Installation
 
