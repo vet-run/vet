@@ -50,7 +50,9 @@ brew install vet-run
 ```
 **Note:** The formula is named `vet-run` to avoid a conflict with another tool in the Homebrew ecosystem, but this command will correctly install the `vet` executable on your system.
 
-## Arch Linux
+## Community Packages
+
+### Arch Linux
 
 Installation from the Arch User Repository (AUR) is recommended for users of Arch or Arch-based Linux distributions. The official procedure is documented [here](https://wiki.archlinux.org/title/Arch_User_Repository#Installing_and_upgrading_packages), but here are the steps:
 ```
