@@ -51,6 +51,7 @@ brew install vet-run
 **Note:** The formula is named `vet-run` to avoid a conflict with another tool in the Homebrew ecosystem, but this command will correctly install the `vet` executable on your system.
 
 ## Community Packages
+_These packages are maintained by the community. We are grateful for their efforts, but please report any packaging-specific issues to the respective package maintainer, not to this project's issue tracker._
 
 ### Arch Linux
 
