@@ -61,11 +61,15 @@ check_dependencies() {
 }
 
 build_authentication() {
-    # Tell curl to check ~./netrc for authentication credentials.
+    # Tell curl to check ~/.netrc for authentication credentials.
     if [[ "${DOWNLOAD_CMD[0]}" == "curl" ]]; then
         NETRC="${NETRC:-}"
         [[ ! "$NETRC" ]] && NETRC_ARG=() || NETRC_ARG=(-n)
     fi
+
+    # Build Authorization header, if token exists.
+    VET_TOKEN="${VET_TOKEN:-}"
+    [[ ! "$VET_TOKEN" ]] && AUTH_HEADER=() || AUTH_HEADER=(--header "Authorization: bearer $VET_TOKEN")
 }
 
 trap cleanup EXIT INT TERM
@@ -120,7 +124,7 @@ TMPFILE=$(mktemp) || { log_error "Failed to create temporary file."; exit 1; }
 TMPFILE_DIFF=$(mktemp) || { log_error "Failed to create temporary diff file."; exit 1; }
 
 log_info "Downloading script from: $URL"
-if ! "${DOWNLOAD_CMD[@]}" "$TMPFILE" "$URL" "${NETRC_ARG[@]}"; then
+if ! "${DOWNLOAD_CMD[@]}" "$TMPFILE" "$URL" "${AUTH_HEADER[@]}" "${NETRC_ARG[@]}"; then
     log_error "Download failed. Check URL and network connection."
     exit 1
 fi
