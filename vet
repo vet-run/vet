@@ -39,6 +39,7 @@ OPTIONS:
     -f, --force     Skip all interactive prompts and execute immediately.
                     Use with extreme caution in trusted environments.
     -h, --help      Display this help message.
+    -n, --netrc     Use ~/.netrc credentials for authentication.
 EOF
 }
 
@@ -59,6 +60,14 @@ check_dependencies() {
     fi
 }
 
+build_authentication() {
+    # Tell curl to check ~./netrc for authentication credentials.
+    if [[ "${DOWNLOAD_CMD[0]}" == "curl" ]]; then
+        NETRC="${NETRC:-}"
+        [[ ! "$NETRC" ]] && NETRC_ARG=() || NETRC_ARG=(-n)
+    fi
+}
+
 trap cleanup EXIT INT TERM
 
 FORCE_MODE=0
@@ -72,6 +81,10 @@ while [[ $# -gt 0 ]]; do
         -h|--help)
             usage
             exit 0
+            ;;
+        -n|--netrc)
+            NETRC=1
+            shift
             ;;
         --)
             shift
@@ -100,13 +113,14 @@ shift
 SCRIPT_ARGS=("$@")
 
 check_dependencies
+build_authentication
 
 mkdir -p "$CACHE_DIR"
 TMPFILE=$(mktemp) || { log_error "Failed to create temporary file."; exit 1; }
 TMPFILE_DIFF=$(mktemp) || { log_error "Failed to create temporary diff file."; exit 1; }
 
 log_info "Downloading script from: $URL"
-if ! "${DOWNLOAD_CMD[@]}" "$TMPFILE" "$URL"; then
+if ! "${DOWNLOAD_CMD[@]}" "$TMPFILE" "$URL" "${NETRC_ARG[@]}"; then
     log_error "Download failed. Check URL and network connection."
     exit 1
 fi
