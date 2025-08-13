@@ -64,9 +64,10 @@ check_dependencies() {
 
 build_authentication() {
     # Tell curl to check ~/.netrc for authentication credentials.
+    NETRC="${NETRC:-}"
+    [[ ! "$NETRC" ]] && NETRC_ARG=()
     if [[ "${DOWNLOAD_CMD[0]}" == "curl" ]]; then
-        NETRC="${NETRC:-}"
-        [[ ! "$NETRC" ]] && NETRC_ARG=() || NETRC_ARG=(-n)
+        NETRC_ARG=(-n)
     fi
 
     # Build Authorization header, if token exists.
