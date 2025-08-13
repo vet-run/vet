@@ -94,7 +94,9 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -t|--token-stdin)
-            IFS= read -r VET_TOKEN
+            if [[ ! -t 0 ]]; then
+                IFS= read -r VET_TOKEN
+            fi
             shift
             ;;
         --)
