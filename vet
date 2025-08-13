@@ -40,6 +40,8 @@ OPTIONS:
                     Use with extreme caution in trusted environments.
     -h, --help      Display this help message.
     -n, --netrc     Use ~/.netrc credentials for authentication.
+    -t, --token-stdin
+                    Set authentication token from standard input.
 EOF
 }
 
@@ -88,6 +90,10 @@ while [[ $# -gt 0 ]]; do
             ;;
         -n|--netrc)
             NETRC=1
+            shift
+            ;;
+        -t|--token-stdin)
+            IFS= read -r VET_TOKEN
             shift
             ;;
         --)
