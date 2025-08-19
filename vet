@@ -42,7 +42,7 @@ OPTIONS:
 EOF
 }
 
-# shellcheck disable=SC2317
+# shellcheck disable=SC2317,SC2329
 cleanup() {
     [ -n "${TMPFILE:-}" ] && [ -f "${TMPFILE}" ] && rm -f "${TMPFILE}"
     [ -n "${TMPFILE_DIFF:-}" ] && [ -f "${TMPFILE_DIFF}" ] && rm -f "${TMPFILE_DIFF}"
