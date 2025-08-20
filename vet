@@ -36,9 +36,23 @@ USAGE:
     vet [OPTIONS] <URL> [SCRIPT_ARGUMENTS...]
 
 OPTIONS:
-    -f, --force     Skip all interactive prompts and execute immediately.
-                    Use with extreme caution in trusted environments.
-    -h, --help      Display this help message.
+    -f, --force         Skip all interactive prompts and execute immediately.
+                        Use with extreme caution in trusted environments.
+    -h, --help          Display this help message.
+
+AUTHENTICATION OPTIONS:
+    --auth-header <TPL> Use a custom header template for token authentication.
+                        The template must contain '{}' as a placeholder for the token.
+                        Example: --auth-header "PRIVATE-TOKEN: {}"
+                        Overrides VET_AUTH_HEADER environment variable.
+    -t, --token-stdin   Read the authentication token from standard input.
+                        Takes precedence over VET_AUTH_TOKEN environment variable.
+    -n, --netrc         Use ~/.netrc credentials for authentication.
+                        (Used only if token-based auth is not active).
+
+ENVIRONMENT VARIABLES:
+    VET_AUTH_TOKEN      Authentication token. Used if --token-stdin is not set.
+    VET_AUTH_HEADER     Authentication header template. Used if --auth-header is not set.
 EOF
 }
 
@@ -50,18 +64,57 @@ cleanup() {
 
 check_dependencies() {
     if command -v curl &>/dev/null; then
-        DOWNLOAD_CMD=(curl -fsSL -o)
+        DOWNLOAD_CMD=(curl -fsSL)
+        OUTPUT_ARGS=(-o)
     elif command -v wget &>/dev/null; then
-        DOWNLOAD_CMD=(wget -qO)
+        DOWNLOAD_CMD=(wget -q)
+        OUTPUT_ARGS=(-O)
     else
         log_error "This tool requires either 'curl' or 'wget'."
         exit 1
     fi
 }
 
+configure_authentication() {
+    if [ -n "${VET_AUTH_TOKEN:-}" ]; then
+        log_info "Using token for authentication."
+
+        local template="${AUTH_HEADER_TPL:-${VET_AUTH_HEADER:-}}"
+        if [[ -z "$template" ]]; then
+            template="Authorization: Bearer {}"
+            log_info "Using default auth header template: ${template}"
+        fi
+
+        if [[ "$template" != *"{}"* ]]; then
+            log_error "Authentication header template must contain the placeholder '{}'."
+            exit 1
+        fi
+        local final_header="${template/'{}'/"$VET_AUTH_TOKEN"}"
+
+        if [[ "${DOWNLOAD_CMD[0]}" == curl ]]; then
+            DOWNLOAD_CMD+=(-H "$final_header")
+        else
+            DOWNLOAD_CMD+=("--header=$final_header")
+        fi
+        return
+    fi
+    if [ "$NETRC" -eq 1 ]; then
+        log_warn "The --netrc flag is often incompatible with modern, token-based APIs (e.g., GitHub, GitLab)."
+        log_info "For best results, use token authentication via --token-stdin or the VET_AUTH_TOKEN variable."
+
+        if [[ "${DOWNLOAD_CMD[0]}" == curl ]]; then
+            DOWNLOAD_CMD+=(-n)
+        fi
+        return
+    fi
+}
+
 trap cleanup EXIT INT TERM
 
 FORCE_MODE=0
+NETRC=0
+TOKEN_STDIN=0
+AUTH_HEADER_TPL=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -72,6 +125,23 @@ while [[ $# -gt 0 ]]; do
         -h|--help)
             usage
             exit 0
+            ;;
+        --auth-header)
+            if [[ -z "${2-}" ]]; then
+                log_error "--auth-header requires a template argument."
+                usage
+                exit 1
+            fi
+            AUTH_HEADER_TPL="$2"
+            shift 2
+            ;;
+        -n|--netrc)
+            NETRC=1
+            shift
+            ;;
+        -t|--token-stdin)
+            TOKEN_STDIN=1
+            shift
             ;;
         --)
             shift
@@ -88,6 +158,13 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
+if [ "$TOKEN_STDIN" -eq 1 ]; then
+    if ! IFS= read -r VET_AUTH_TOKEN || [ -z "$VET_AUTH_TOKEN" ]; then
+        log_error "Failed to read a non-empty token from stdin."
+        exit 1
+    fi
+fi
+
 URL="${1-}"
 
 if [ -z "$URL" ]; then
@@ -100,14 +177,15 @@ shift
 SCRIPT_ARGS=("$@")
 
 check_dependencies
+configure_authentication
 
 mkdir -p "$CACHE_DIR"
 TMPFILE=$(mktemp) || { log_error "Failed to create temporary file."; exit 1; }
 TMPFILE_DIFF=$(mktemp) || { log_error "Failed to create temporary diff file."; exit 1; }
 
 log_info "Downloading script from: $URL"
-if ! "${DOWNLOAD_CMD[@]}" "$TMPFILE" "$URL"; then
-    log_error "Download failed. Check URL and network connection."
+if ! "${DOWNLOAD_CMD[@]}" "${OUTPUT_ARGS[@]}" "$TMPFILE" "$URL"; then
+    log_error "Download failed. Check URL, credentials, and network connection."
     exit 1
 fi
 
@@ -125,6 +203,15 @@ elif command -v batcat &>/dev/null; then
     BAT_CMD="batcat"
 fi
 
+read_reply() {
+    if [[ "$TOKEN_STDIN" -eq 1 ]] && [[ -t 0 ]]; then
+        read -n 1 -r REPLY < /dev/tty
+    else
+        read -n 1 -r REPLY
+    fi
+    echo
+}
+
 # Generate a filesystem-safe cache key from the URL.
 CACHE_FILE_ID=$(echo -n "$URL" | sha256sum | awk '{print $1}')
 CACHE_FILE_PATH="${CACHE_DIR}/${CACHE_FILE_ID}.sh"
@@ -135,7 +222,7 @@ if [ -f "$CACHE_FILE_PATH" ]; then
     elif [ "$FORCE_MODE" -eq 0 ]; then
         log_warn "Script has CHANGED since the last run."
         printf "[?] %sShow diff?%s [y/N] " "$C_BOLD" "$C_RESET"
-        read -n 1 -r REPLY; echo
+        read_reply
         if [[ "$REPLY" =~ ^[Yy]$ ]]; then
             less -U "$TMPFILE_DIFF"
         fi
@@ -144,7 +231,7 @@ fi
 
 execute_script() {
     EXEC_EXIT_CODE=0
-    bash "$TMPFILE" "${SCRIPT_ARGS[@]}" || EXEC_EXIT_CODE=$?
+    env -u VET_AUTH_TOKEN bash "$TMPFILE" "${SCRIPT_ARGS[@]}" || EXEC_EXIT_CODE=$?
     if [ $EXEC_EXIT_CODE -eq 0 ]; then
         cp "$TMPFILE" "$CACHE_FILE_PATH"
         log_info "Script cached for future comparison."
@@ -165,7 +252,7 @@ if command -v shellcheck &>/dev/null; then
     if ! shellcheck "$TMPFILE"; then
         log_warn "ShellCheck found potential issues."
         printf "[?] %sContinue with review despite issues?%s [y/N] " "$C_BOLD" "$C_RESET"
-        read -n 1 -r REPLY; echo
+        read_reply
         if [[ ! "$REPLY" =~ ^[Yy]$ ]]; then
             log_info "Execution aborted due to ShellCheck warnings."
             exit 1
@@ -179,7 +266,7 @@ fi
 if [ -t 0 ]; then
     # log_info "Displaying script for review. Press 'q' to exit viewer."
     printf "[?] %sDisplaying script for review?%s [y/N] " "$C_BOLD" "$C_RESET"
-    read -n 1 -r REPLY; echo
+    read_reply
     if [[ "$REPLY" =~ ^[Yy]$ ]]; then
         if [ -n "$BAT_CMD" ]; then
             "$BAT_CMD" -l sh --paging=always "$TMPFILE"
@@ -188,7 +275,7 @@ if [ -t 0 ]; then
         fi
     fi
     printf "[?] %sExecute this script?%s [y/N] " "$C_BOLD" "$C_RESET"
-    read -n 1 -r REPLY; echo
+    read_reply
 else
     # Non-interactive session (e.g., CI/CD): Just print the script content.
     log_info "Running in non-interactive mode. Displaying script content:"
