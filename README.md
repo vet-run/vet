@@ -133,6 +133,38 @@ Skip all interactive prompts and execute immediately. Use with caution.
 
 Display the help message.
 
+\-n, \--netrc
+
+Use ~/.netrc credentials for authentication.
+
+\-t, \--token-stdin
+
+Set authentication token from standard input.
+
+#### Authentication
+
+`vet` can:
+
+-   Read from a `~/.netrc` file.
+```
+# Example ~/.netrc file to authenticate with GitHub private repositories
+machine raw.githubusercontent.com
+login api
+password <YOUR_GITHUB_PERSONAL_ACCESS_TOKEN>
+```
+
+-   Detect and read a `$VET_TOKEN` from an environment variable into an `Authorization` token.
+```bash
+# Example setting a VET_TOKEN from an environment variable for private GitHub repository access
+export VET_TOKEN=<YOUR_GITHUB_PERSONAL_ACCESS_TOKEN>
+```
+
+-   Read an `Authorization` token from standard input.
+```bash
+# Example setting a VET_TOKEN from standared input for private GitHub repository access
+echo <YOUR_GITHUB_PERSONAL_ACCESS_TOKEN> | ./vet --token-stdin https://example.com/private.sh
+```
+
 ## Project Philosophy & Technical Decisions
 
 ### Bash 4+ is a Required Dependency
