@@ -121,6 +121,9 @@ vet https://example.com/setup.sh --user myuser --version latest
 
 # Non-interactive mode for trusted scripts in automated environments (e.g., CI/CD)
 vet --force https://my-trusted-internal-script.sh
+
+# Example setting a VET_AUTH_TOKEN from standared input for private repository access
+echo <YOUR_ACCESS_TOKEN> | vet --token-stdin https://example.com/private.sh
 ```
 
 #### Options
@@ -141,28 +144,61 @@ Use ~/.netrc credentials for authentication.
 
 Set authentication token from standard input.
 
-#### Authentication
+\--auth-header \<TPL>
 
-`vet` can:
+Use a custom header template for token authentication. The template must contain {} as a placeholder for the token. This is the most flexible way to authenticate. Example: `--auth-header "PRIVATE-TOKEN: {}"`
+
+### Authentication
+
+`vet` supports two main authentication methods: token-based (recommended for its flexibility) and `.netrc`. Token-based authentication will always be used if a token is provided.
+
+#### Token-Based Authentication
+To support various services like GitHub, GitLab, and private artifact repositories, `vet` allows you to define a custom authentication header. This is a two-part system: you provide the header template and the token itself.
+
+#### 1. Providing the Header Template
+You can specify the format of the authentication header using:
+* The `--auth-header "TEMPLATE"` flag (takes highest precedence).
+* The `VET_AUTH_HEADER` environment variable.
+
+The template must contain `{}` which will be replaced with your token. If you don't provide a template, `vet` will use a default of `"Authorization: Bearer {}"`.
+
+#### 2. Providing the Token
+
+You can provide the secret token using:
+* The `--token-stdin` flag, by piping the token to `vet`.
+* The `VET_AUTH_TOKEN` environment variable.
+---
+#### Examples
+
+#### Example 1: Accessing a private GitLab repository
+GitLab uses the `PRIVATE-TOKEN` header. We can provide our token from an environment variable and specify the header format with the flag.
+```bash
+# Your GitLab Personal Access Token
+export VET_AUTH_TOKEN="glpat-123xyz..."
+
+# Use the --auth-header flag to specify GitLab's format
+vet --auth-header "PRIVATE-TOKEN: {}" https://gitlab.com/api/v4/projects/.../raw
+```
+#### Example 2: Accessing a private GitHub repository using the GitHub CLI
+GitHub requires an `Authorization: token ...` header for classic PATs. We can securely pipe the token directly from the gh CLI.
+```bash
+# Pipe the token from `gh auth token` and provide the correct header template
+gh auth token | vet --token-stdin --auth-header "Authorization: token {}" https://raw.githubusercontent.com/owner/private-repo/main/script.sh
+```
+---
+#### `.netrc` File
+As a fallback, `vet` can read credentials from a `~/.netrc` file if the `-n`, `--netrc` flag is used. This method will be ignored if `VET_AUTH_TOKEN` is set or `--token-stdin` is used.
 
 -   Read from a `~/.netrc` file.
-```
+```bash
 # Example ~/.netrc file to authenticate with GitHub private repositories
 machine raw.githubusercontent.com
 login api
 password <YOUR_GITHUB_PERSONAL_ACCESS_TOKEN>
 ```
-
--   Detect and read a `$VET_TOKEN` from an environment variable into an `Authorization` token.
+Then run with the flag:
 ```bash
-# Example setting a VET_TOKEN from an environment variable for private GitHub repository access
-export VET_TOKEN=<YOUR_GITHUB_PERSONAL_ACCESS_TOKEN>
-```
-
--   Read an `Authorization` token from standard input.
-```bash
-# Example setting a VET_TOKEN from standared input for private GitHub repository access
-echo <YOUR_GITHUB_PERSONAL_ACCESS_TOKEN> | ./vet --token-stdin https://example.com/private.sh
+vet -n https://raw.githubusercontent.com/owner/private-repo/main/script.sh
 ```
 
 ## Project Philosophy & Technical Decisions
